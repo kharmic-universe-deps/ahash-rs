@@ -35,7 +35,7 @@ runtime-rng = ["getrandom"]
 # (If runtime-rng is enabled this does nothing.)
 # If this is on (and runtime-rng is off) it implies the produced binary will not be identical.
 # If this is disabled and runtime-rng is unavailable constant keys are used.
-compile-time-rng = ["const-random"]
+#compile-time-rng = ["const-random"]
 
 # Do not use any random number generator (either at compile time or runtime)
 # If either runtime-rng or compile-time-rng are enabled this does nothing.
@@ -79,15 +79,15 @@ codegen-units = 1
 version_check = "0.9.4"
 
 [dependencies]
-const-random = { version = "0.1.17", optional = true }
-serde = { version = "1.0.117", optional = true }
-cfg-if = "1.0"
+#const-random = { version = "0.1.17", optional = true }
+serde = { version = "1.0", optional = true }
+cfg-if = {git = "ssh://git@github.com/kharmic-universe-deps/cfg-if-rs.git", branch = "ku-0.1.0"}
 atomic-polyfill = { version="1.0.1", optional=true}
-getrandom = { version = "0.2.7", optional = true }
-zerocopy = { version = "0.7.31", default-features = false, features = ["simd"] }
+getrandom = { git="ssh://git@github.com/kharmic-universe-deps/getrandom-rs.git", branch = "ku-0.1.0", optional = true }
+zerocopy = { git="ssh://git@github.com/kharmic-universe-deps/zerocopy-rs.git", branch = "ku-0.1.0", default-features = false, features = ["simd"] }
 
 [target.'cfg(not(all(target_arch = "arm", target_os = "none")))'.dependencies]
-once_cell = { version = "1.18.0", default-features = false, features = ["alloc"] }
+once_cell = { git = "ssh://git@github.com/kharmic-universe-deps/once-cell-rs.git", branch = "ku-0.1.0", default-features = false, features = ["alloc"] }
 
 [dev-dependencies]
 no-panic = "0.1.10"

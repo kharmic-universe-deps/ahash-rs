@@ -79,7 +79,7 @@ cfg_if::cfg_if! {
 
             SEEDS.get_or_init(|| {
                 let mut result: [u8; 64] = [0; 64];
-                getrandom::getrandom(&mut result).expect("getrandom::getrandom() failed.");
+                getrandom::fill(&mut result).expect("getrandom::getrandom() failed.");
                 Box::new(result.convert())
             })
         }
@@ -202,7 +202,7 @@ cfg_if::cfg_if! {
 /// Provides a [Hasher] factory. This is typically used (e.g. by [HashMap]) to create
 /// [AHasher]s in order to hash the keys of the map. See `build_hasher` below.
 ///
-/// [build_hasher]: ahash::
+/// [build_hasher]: ahash
 /// [Hasher]: std::hash::Hasher
 /// [BuildHasher]: std::hash::BuildHasher
 /// [HashMap]: std::collections::HashMap
