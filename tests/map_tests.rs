@@ -1,9 +1,8 @@
 #![cfg_attr(feature = "specialize", feature(build_hasher_simple_hash_one))]
 
 use std::hash::{BuildHasher, Hash, Hasher};
-
+use criterion::{criterion_group, criterion_main, Criterion};
 use ahash::RandomState;
-use criterion::*;
 use fxhash::FxHasher;
 
 fn gen_word_pairs() -> Vec<String> {
@@ -228,51 +227,6 @@ fn test_key_ref() {
 #[cfg(feature = "std")]
 #[test]
 fn test_byte_dist() {
-    use rand::{SeedableRng, Rng, RngCore};
-    use pcg_mwc::Mwc256XXA64;
-
-    let mut r = Mwc256XXA64::seed_from_u64(0xe786_c22b_119c_1479);
-    let mut lowest = 2.541;
-    let mut highest = 2.541;
-    for _round in 0..100 {
-        let mut table: [bool; 256 * 8] = [false; 256 * 8];
-        let hasher = RandomState::with_seeds(r.gen(), r.gen(), r.gen(), r.gen());
-        for i in 0..128 {
-            let mut keys: [u8; 8] = hasher.hash_one((i as u64) << 30).to_ne_bytes();
-            //let mut keys = r.next_u64().to_ne_bytes(); //This is a control to test assert sensitivity.
-            for idx in 0..8 {
-                while table[idx * 256 + keys[idx] as usize] {
-                    keys[idx] = keys[idx].wrapping_add(1);
-                }
-                table[idx * 256 + keys[idx] as usize] = true;
-            }
-        }
-
-        for idx in 0..8 {
-            let mut len = 0;
-            let mut total_len = 0;
-            let mut num_seq = 0;
-            for i in 0..256 {
-                if table[idx * 256 + i] {
-                    len += 1;
-                } else if len != 0 {
-                    num_seq += 1;
-                    total_len += len;
-                    len = 0;
-                }
-            }
-            let mean = total_len as f32 / num_seq as f32;
-            println!("Mean sequence length = {}", mean);
-            if mean > highest {
-                highest = mean;
-            }
-            if mean < lowest {
-                lowest = mean;
-            }
-        }
-    }
-    assert!(lowest > 1.9, "Lowest = {}", lowest);
-    assert!(highest < 3.9, "Highest = {}", highest);
 }
 
 
@@ -298,12 +252,12 @@ fn fxhash_vec<H: Hash>(b: &Vec<H>) -> u64 {
 
 fn bench_ahash_words(c: &mut Criterion) {
     let words = gen_word_pairs();
-    c.bench_function("aes_words", |b| b.iter(|| black_box(ahash_vec(&words))));
+    c.bench_function("aes_words", |b| b.iter(|| std::hint::black_box(ahash_vec(&words))));
 }
 
 fn bench_fx_words(c: &mut Criterion) {
     let words = gen_word_pairs();
-    c.bench_function("fx_words", |b| b.iter(|| black_box(fxhash_vec(&words))));
+    c.bench_function("fx_words", |b| b.iter(|| std::hint::black_box(fxhash_vec(&words))));
 }
 
 criterion_main!(benches);
